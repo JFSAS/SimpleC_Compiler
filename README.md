@@ -2,48 +2,43 @@
 
 ## 1. 问题描述
 
-实现C语言子集的编译器，包括词法分析、语法分析、语义分析、中间代码生成、目标代码生成等功能。包含整型、函数的声明、赋值语句、if else语句、while语句、数组。
+实现C语言子集的编译器，包括词法分析、语法分析、语义分析、中间代码生成、目标代码生成等功能。包含整型、函数的声明、赋值语句、if else语句、while语句、数组，支持//注释不支持/*... */注释。
 
 ## 2. 文法定义
 
-```bnf
-NUM ::= digit*
-digital ::= 0|1|2|3|4|5|6|7|8|9
-ID ::= letter(letter|digit)*
-letter ::= a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z
-<string> ::= "<character>*"
-<character> ::= {ALL ASCII CHARACTERS EXCEPT }
-<program> ::= <declaration-list>
-<declaration-list> ::= <declaration-list><declaration> | <declaration> 
-<declaration> ::= <var-declaration> | <fun-declaration>
-<var-declaration> ::= <type-specifier> ID; | <type-specifier> ID[NUM];
-<fun-declaration> ::= <type-specifier> ID (<params>) <compound-stam>
-<type-specifier> ::= int | void 
-<params> ::= <param-list> | void
-<params-list> ::= <params-list> <param> | <param>
-<param> ::= <type-specifier> ID | <typer-specifier> ID[]
-<compound-stam> ::={<local-declarations><statement-list>}
-<local-declarations> ::=<local-declarations><var-declaration> | <empty>
-<statement-list> ::=<statement-list><statement> | <empty>\
-<statement> ::= <expression-stam> | <compound-stam> | <selection-stam> | <iteration-list> | <return-list> | <print-stam>
-<expression-stam> ::= <expression>; 
-<selection-stam> ::= if (<expression>) <compound-stam> | if (<expression>) <compound-stam> else <compound-stam>
-<iteration-stam> ::= while (<expression>) <compound-stam>
-<return-stam> ::= return; | return <expression>;
-<print-stam> ::= printf(<string>); | printf(<var>);
-<expression> ::= <var> = <expression> | <simple-expression>
-<var> ::= ID | ID[<expression>] 
-<simple-expression> ::= <additive-expression> <relop> <additive-expression> | <additive-expression>
-<relop> ::= <= | < | > | >= | == | !=
-<additive-expression> ::= <additive-expression> <addop> <term> | <term>
-<addop> ::= + | -
-<term> ::= <term> <mulop> <factor> | <factor>
-<mulop> ::= * | /
-<factor> ::= ( <expression> ) | <var> | NUM | <call>
+``` ebnf
+<NUM> ::= <digit>,{<digit>};
+<digital> ::= 0|1|2|3|4|5|6|7|8|9;
+<ID> ::= <letter>,{(<letter>|<digit>)};
+<letter> ::= a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z;
+<string> ::= '"' <character> , {<character>}'"'; 
+<character> ::= (*ALL ASCII CHARACTERS EXCEPT *);
+<program> ::= {<declaration>};
+<declaration> ::= <var-declaration> | <fun-declaration>;
+<var-declaration> ::= <type> ['*'] ID ['['NUM']'] {',' ID ['['NUM']']};
+<fun-declaration> ::= <type> ['*'] ID '(' <params> ')' '{' <body_decl> '}';
+<type> ::= int | void | char;
+<params> ::= void | type ['*'] ID {',' type ['*'] ID};
+<body_decl> ::={var-declarations>}, {<statement>};
+<statement> ::= <selection-stam> | <iteration-list> | <return_stam> | <print_stam> | <expression> ';';
+<selection-stam> ::= 'if' '('<expression>')' '{'{<statement>}'}' | 'if' (<expression>) '{'{<statements>}'}' 'else' '{' {<statements>}'}';
+<iteration-stam> ::= 'while' '(' <expression> ')' '{'<statements>'}';
+<return-stam> ::= 'return'';' | return <expression>';';
+<print-stam> ::= 'printf''('<string>')'';' | 'printf''('<var>')'';';
+<expression> ::= [<var> '='] <or_expression> ';';
+<var> ::= ID | ID[<expression>] ;
+<or_expression> ::= <and_expression> '||', <or_expression> | <and_expression>;
+<and_expression> ::= <simple_expression> '&&' <and_expression> | <simple_expression>;
+<simple_expresion> ::= <additive_expression> <relop> <additive_expression> | <additive_expression>;
+<relop> ::= <= | < | > | >= | == | != ;
+<additive-expression> ::= <term> <addop> <additive_expression> | <term>;
+<addop> ::= + | -;
+<term> ::= <factor> <mulop> <term> | <factor>;
+<mulop> ::= * | /;
+<factor> ::= ( <expression> ) | <var> | NUM | <call>;
 <call> ::= ID ( <args> )
 <args> ::= <arg-list> | <empty>
 <arg-list> ::= <arg-list> , <expression> | <expression>
-<printf> ::= printf(<string>)
 ```
 
 ```
@@ -84,14 +79,6 @@ letter ::= a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|A|B|C|D|E|F|G|H|I
 | != | NE | |
 | == | EQ | |
 | = | ASSIGN | |
-| ( | LPAREN | |
-| ) | RPAREN | |
-| { | LBRACE | |
-| } | RBRACE | |
-| [ | LBRACKET | |
-| ] | RBRACKET | |
-| , | COMMA | |
-| ; | SEMI | |
 |int | INT | |
 |void | VOID | |
 |if | IF | |
@@ -142,4 +129,13 @@ void main()
 
 ## 语义分析
 
-将语法分析的结果转换为四元组或者汇编代码。
+### 静态语义检查
+- 有无重复定义 complicated define
+- 未定义的变量或函数 undefined id
+- 赋值类型检查 type error
+- 
+## 学习参考
+
+- [「700行手写编译器」Part 1：项目背景与设计思路](https://www.bilibili.com/video/BV1Kf4y1V783/?spm_id_from=333.337.search-card.all.click&vd_source=f1b40d4c8a7cccb5d8d3c3fae7ed593e)bilibili
+- [手把手教你构建 C 语言编译器](https://lotabout.me/2015/write-a-C-interpreter-0/)blog
+- [重构c4项目仓库](https://github.com/lotabout/write-a-C-interpreter)

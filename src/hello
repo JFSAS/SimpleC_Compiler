@@ -1,0 +1,21 @@
+int a;
+int add(int a,int b){
+    return a+b;
+}
+int main(void){
+    int a,b,*c,d[10];
+    a=2;
+    b=3;
+    d[0]=1;
+    a= a+b*a || a-a && a/b + !a + a==b || a>=b;
+    if(a>0){
+        printf("true");
+        printf(a);
+    }else{
+        printf("false");
+    }
+    while(a>0){
+        a--;
+    }
+    return 0;
+}

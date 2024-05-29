@@ -7,8 +7,9 @@ symbol * sym_ptr;
 int token_val;
 char *src;
 int token;
-char *data;
+char* data;
 int line = 1;
+CODE *code;
 int load_src(char* filename){
     int cnt;
     FILE* file=fopen(filename,"r");
@@ -35,11 +36,16 @@ int main(int argc,char** argv){
     if(!(data = malloc(MAX_SIZE))) {
         printf("Could not malloc %d memory to data",MAX_SIZE);
     }
+    if(!(code = malloc(MAX_SIZE))){
+        printf("Could not malloc %d memory to code",MAX_SIZE);
+    }
     if(!(src = malloc(MAX_SIZE))){
         printf("Could not malloc %d memory to source code",MAX_SIZE);
     }
     memset(src,0,MAX_SIZE);
-    if(load_src(*(argv+1)) != 0) return -1;
-    while(1){GetToken();}
+    char* file = "hello";
+    load_src(file);
+    //if(load_src(*(argv+1)) != 0) return -1;
+    program();
     
-}
+} 
