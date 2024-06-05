@@ -21,7 +21,7 @@ void GetToken(){
                 token += token *127 + *src++;
             current_symbol = symbol_table;
             while(current_symbol -> Token){
-                if(current_symbol -> Hash == token && memcmp(src,current_symbol -> Name, src - ch_ptr)){
+                if(current_symbol -> Hash == token ){
                     token = current_symbol -> Token;
                     return;
                 }
@@ -29,12 +29,12 @@ void GetToken(){
             }
             current_symbol -> Hash = token;
             current_symbol -> Token = ID;
-            current_symbol -> Name = ch_ptr;
             token = ID;
             return;
         }
         //identify NUM
         else if(token >='0' && token <= '9'){
+            token_val = token - '0';
             while(*src >= '0' && *src <= '9' ){
                 token_val = token_val*10 + *src++ - '0';
             }
@@ -43,18 +43,11 @@ void GetToken(){
         }
         //identify STRING
         else if(token == '\"'){
-            ch_ptr = data;
-            token_val =0;
+            token_val =(int)data - (int)first_data;
             while(*src != '\"'){
                 *data++ = *src++;
-                token_val ++;
             }
             src++;
-            current_symbol = symbol_table;
-            while(current_symbol++ -> Token);
-            current_symbol -> Token = STRING;
-            current_symbol -> Name = ch_ptr;
-            current_symbol -> Value = token_val; 
             token = STRING;
             return ;
         }

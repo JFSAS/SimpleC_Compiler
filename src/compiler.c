@@ -8,8 +8,9 @@ int token_val;
 char *src;
 int token;
 char* data;
+char* first_data;
 int line = 1;
-CODE *code;
+instr *code;
 int load_src(char* filename){
     int cnt;
     FILE* file=fopen(filename,"r");
@@ -36,9 +37,11 @@ int main(int argc,char** argv){
     if(!(data = malloc(MAX_SIZE))) {
         printf("Could not malloc %d memory to data",MAX_SIZE);
     }
+    first_data = data;
     if(!(code = malloc(MAX_SIZE))){
         printf("Could not malloc %d memory to code",MAX_SIZE);
     }
+    first_instr = code;
     if(!(src = malloc(MAX_SIZE))){
         printf("Could not malloc %d memory to source code",MAX_SIZE);
     }
@@ -47,5 +50,9 @@ int main(int argc,char** argv){
     load_src(file);
     //if(load_src(*(argv+1)) != 0) return -1;
     program();
-    
+    if(idmain == NULL){
+        printf("Could not find main function\n");
+        return -1;
+    }
+    write_as();
 } 
